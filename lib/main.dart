@@ -131,7 +131,7 @@ class MyHomePage extends StatelessWidget {
                   min: 1,
                   max: 20,
                   divisions: 19,
-                  label: 'Increase/Decrease by ${counter.step}',
+                  label: '${counter.step}',
                   onChanged: (value) {
                     counter.setStep(value);
                   },
