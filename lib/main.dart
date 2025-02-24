@@ -48,15 +48,39 @@ void setupWindow() {
 /// _not_ depend on Provider.
 class Counter with ChangeNotifier {
   int age = 0;
+  int step = 1;
+  String ageText = "You're a child!";
+
+  void setStep(double newStep) {
+    step = newStep.toInt();
+    notifyListeners();
+  }
 
   void increment() {
-    age += 1;
+    age += step;
+    ageRange();
     notifyListeners();
   }
 
   void decrement() {
-    age -= 1;
+    age -= step;
+    if (age < 0) age = 0;
+    ageRange();
     notifyListeners();
+  }
+
+  void ageRange() {
+    if (age < 13) {
+      ageText = "You're a child!";
+    } else if (age < 20) {
+      ageText = "Teenager Time!";
+    } else if (age < 30) {
+      ageText = "You're a young adult!";
+    } else if (age < 50) { 
+      ageText = "You're an adult now!";
+    } else {
+      ageText = "Golden Years!";
+    }
   }
 }
 
@@ -78,19 +102,7 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatelessWidget {
   const MyHomePage({super.key});
-/*
-  void _updateEnergy() {
-    if (happinessLevel < 30 && hungerLevel < 30) {
-      energyLevel = 0.2;
-    } else if (happinessLevel < 50 && hungerLevel < 50) {
-      energyLevel = 0.3;
-    } else if (happinessLevel < 70 && hungerLevel < 70) {
-      energyLevel = 0.6;
-    } else {
-      energyLevel = 0.9;
-    }
-  }
-*/
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -107,46 +119,55 @@ class MyHomePage extends StatelessWidget {
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
             ),
-            TextButton(
-              onPressed: () {
-                var counter = context.read<Counter>();
-                counter.increment();
-              }, 
-              style: TextButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white, 
+            Consumer<Counter>(
+              builder: (context, counter, child) => Slider(
+                value: counter.step.toDouble(),
+                min: 1,
+                max: 20,
+                divisions: 19,
+                label: '${counter.step}',
+                onChanged: (value) {
+                  counter.setStep(value);
+                },
               ),
-              child: const Text('Increase Age'),
             ),
-            TextButton(
-              onPressed: () {
-                var counter = context.read<Counter>();
-                counter.decrement();
-              }, 
-              style: TextButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white, 
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    var counter = context.read<Counter>();
+                    counter.increment();
+                  }, 
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white, 
+                  ),
+                  child: const Text('Increase Age'),
+                ),
+                const SizedBox(width: 20),
+                TextButton(
+                  onPressed: () {
+                    var counter = context.read<Counter>();
+                    counter.decrement();
+                  }, 
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white, 
+                  ),
+                  child: const Text('Reduce Age'),
+                ),
+              ],
+            ),
+            Consumer<Counter>(
+              builder: (context, counter, child) => Text(
+                counter.ageText,
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
-              child: const Text('Reduce Age'),
             ),
           ],
         ),
       ),
-          // You can access your providers anywhere you have access
-          // to the context. One way is to use Provider.of<Counter>(context).
-         // The provider package also defines extension methods on the context
-          // itself. You can call context.watch<Counter>() in a build method
-          // of any widget to access the current state of Counter, and to ask
-          // Flutter to rebuild your widget anytime Counter changes.
-          //
-          // You can't use context.watch() outside build methods, because that
-          // often leads to subtle bugs. Instead, you should use
-          // context.read<Counter>(), which gets the current state
-          // but doesn't ask Flutter for future rebuilds.
-          //
-          // Since we're in a callback that will be called whenever the user
-          // taps the FloatingActionButton, we are not in the build method here.
-          // We should use context.read().
     );
   }
 }
