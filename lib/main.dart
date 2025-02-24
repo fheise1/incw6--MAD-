@@ -50,6 +50,7 @@ class Counter with ChangeNotifier {
   int age = 0;
   int step = 1;
   String ageText = "You're a child!";
+  Color backgroundColor = Colors.white;
 
   void setStep(double newStep) {
     step = newStep.toInt();
@@ -72,14 +73,19 @@ class Counter with ChangeNotifier {
   void ageRange() {
     if (age < 13) {
       ageText = "You're a child!";
+      backgroundColor = Colors.lightBlue;
     } else if (age < 20) {
       ageText = "Teenager Time!";
+      backgroundColor = Colors.lightGreen;
     } else if (age < 30) {
       ageText = "You're a young adult!";
+      backgroundColor = Colors.yellowAccent;
     } else if (age < 50) { 
       ageText = "You're an adult now!";
+      backgroundColor = Colors.orange;
     } else {
       ageText = "Golden Years!";
+      backgroundColor = Colors.grey;
     }
   }
 }
@@ -109,63 +115,56 @@ class MyHomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('In Classwork 6'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Consumer<Counter>(
-              builder: (context, counter, child) => Text(
-                'I am ${counter.age} years old',
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
-            ),
-            Consumer<Counter>(
-              builder: (context, counter, child) => Slider(
-                value: counter.step.toDouble(),
-                min: 1,
-                max: 20,
-                divisions: 19,
-                label: '${counter.step}',
-                onChanged: (value) {
-                  counter.setStep(value);
-                },
-              ),
-            ),
-            Row(
+      body: Consumer<Counter>(
+        builder: (context, counter, child) => Container(
+          color: counter.backgroundColor,
+          child: Center(
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    var counter = context.read<Counter>();
-                    counter.increment();
-                  }, 
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white, 
-                  ),
-                  child: const Text('Increase Age'),
+              children: <Widget>[
+                Text(
+                  'I am ${counter.age} years old',
+                  style: Theme.of(context).textTheme.headlineMedium,
                 ),
-                const SizedBox(width: 20),
-                TextButton(
-                  onPressed: () {
-                    var counter = context.read<Counter>();
-                    counter.decrement();
-                  }, 
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white, 
-                  ),
-                  child: const Text('Reduce Age'),
+                Slider(
+                  value: counter.step.toDouble(),
+                  min: 1,
+                  max: 20,
+                  divisions: 19,
+                  label: 'Increase/Decrease by ${counter.step}',
+                  onChanged: (value) {
+                    counter.setStep(value);
+                  },
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton(
+                      onPressed: counter.increment,
+                      style: TextButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white, 
+                      ),
+                      child: const Text('Increase Age'),
+                    ),
+                    const SizedBox(width: 20),
+                    TextButton(
+                      onPressed: counter.decrement,
+                      style: TextButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white, 
+                      ),
+                      child: const Text('Reduce Age'),
+                    ),
+                  ],
+                ),
+                Text(
+                  counter.ageText,
+                  style: Theme.of(context).textTheme.headlineSmall,
                 ),
               ],
             ),
-            Consumer<Counter>(
-              builder: (context, counter, child) => Text(
-                counter.ageText,
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
