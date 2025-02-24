@@ -47,10 +47,15 @@ void setupWindow() {
 /// [ChangeNotifier] is a class in `flutter:foundation`. [Counter] does
 /// _not_ depend on Provider.
 class Counter with ChangeNotifier {
-  int value = 0;
+  int age = 0;
 
   void increment() {
-    value += 1;
+    age += 1;
+    notifyListeners();
+  }
+
+  void decrement() {
+    age -= 1;
     notifyListeners();
   }
 }
@@ -73,33 +78,60 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatelessWidget {
   const MyHomePage({super.key});
-
+/*
+  void _updateEnergy() {
+    if (happinessLevel < 30 && hungerLevel < 30) {
+      energyLevel = 0.2;
+    } else if (happinessLevel < 50 && hungerLevel < 50) {
+      energyLevel = 0.3;
+    } else if (happinessLevel < 70 && hungerLevel < 70) {
+      energyLevel = 0.6;
+    } else {
+      energyLevel = 0.9;
+    }
+  }
+*/
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Flutter Demo Home Page'),
+        title: const Text('In Classwork 6'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            // Consumer looks for an ancestor Provider widget
-            // and retrieves its model (Counter, in this case).
-            // Then it uses that model to build widgets, and will trigger
-            // rebuilds if the model is updated.
+          children: <Widget>[
             Consumer<Counter>(
               builder: (context, counter, child) => Text(
-                '${counter.value}',
+                'I am ${counter.age} years old',
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
+            ),
+            TextButton(
+              onPressed: () {
+                var counter = context.read<Counter>();
+                counter.increment();
+              }, 
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white, 
+              ),
+              child: const Text('Increase Age'),
+            ),
+            TextButton(
+              onPressed: () {
+                var counter = context.read<Counter>();
+                counter.decrement();
+              }, 
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white, 
+              ),
+              child: const Text('Reduce Age'),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
           // You can access your providers anywhere you have access
           // to the context. One way is to use Provider.of<Counter>(context).
          // The provider package also defines extension methods on the context
@@ -115,12 +147,6 @@ class MyHomePage extends StatelessWidget {
           // Since we're in a callback that will be called whenever the user
           // taps the FloatingActionButton, we are not in the build method here.
           // We should use context.read().
-          var counter = context.read<Counter>();
-          counter.increment();
-        },
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
     );
   }
 }
